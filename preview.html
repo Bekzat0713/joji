@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0d">
+  <meta name="description" content="Небольшая проверка перед большим вечером — Joji live, два билета и мы.">
+  <title>Два года спустя · Joji live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #f2eee8;
+      --paper-soft: rgba(242, 238, 232, .66);
+      --paper-faint: rgba(242, 238, 232, .42);
+      --night: #0b0b0d;
+      --red: #ee584e;
+      --red-soft: #ff8178;
+      --gold: #aaa080;
+      --gold-soft: #d0c49c;
+      --line: rgba(242, 238, 232, .14);
+      --green: #9bc49c;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--night); }
+    body { min-width: 320px; min-height: 100vh; margin: 0; overflow-x: hidden; background: var(--night); color: var(--paper); font-family: "Manrope", sans-serif; -webkit-font-smoothing: antialiased; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .app {
+      position: relative;
+      display: grid;
+      width: 100%;
+      max-width: 100vw;
+      min-height: 100svh;
+      grid-template-rows: auto 1fr auto;
+      isolation: isolate;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(3, 7, 9, .98) 0%, rgba(3, 7, 9, .93) 31%, rgba(3, 7, 9, .68) 55%, rgba(3, 7, 9, .28) 100%),
+        linear-gradient(0deg, rgba(3, 7, 9, .92) 0%, transparent 40%, rgba(3, 7, 9, .34) 100%),
+        url("assets/joji-solaris-hero.png") 62% center / cover no-repeat,
+        #05090a;
+      background-attachment: fixed;
+    }
+
+    .app::before {
+      position: absolute;
+      z-index: -2;
+      top: -18vmax;
+      right: -9vmax;
+      width: 54vmax;
+      height: 72vmax;
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 48% 52% 42% 58% / 60% 38% 62% 40%;
+      background: linear-gradient(145deg, transparent 38%, rgba(255, 100, 88, .08) 39%, transparent 41%), radial-gradient(ellipse at 35% 53%, rgba(238, 88, 78, .18), transparent 52%);
+      box-shadow: inset 0 0 120px rgba(238, 88, 78, .04);
+      content: "";
+      opacity: .32;
+      transform: rotate(-15deg);
+      animation: breathe 14s ease-in-out infinite alternate;
+    }
+
+    .app::after {
+      position: absolute;
+      z-index: 9;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.26'/%3E%3C/svg%3E");
+      content: "";
+      mix-blend-mode: soft-light;
+      opacity: .16;
+    }
+
+    .shell { width: min(100% - 96px, 1240px); margin-inline: auto; }
+    .kicker, .step-label, .mini-label, .ticket-meta, .ticket-row small { font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+
+    .main { position: relative; z-index: 1; display: grid; min-width: 0; min-height: 100svh; align-items: center; padding-block: 56px; }
+    .ambient-word { position: absolute; z-index: -1; top: 50%; right: -5vw; color: transparent; font-family: "Playfair Display", serif; font-size: clamp(150px, 24vw, 340px); font-style: italic; font-weight: 600; line-height: .7; opacity: .28; -webkit-text-stroke: 1px rgba(242, 238, 232, .1); transform: translateY(-50%); user-select: none; }
+    .screen { display: none; width: 100%; min-width: 0; animation: screen-in .65s var(--ease) both; }
+    .screen.active { display: block; }
+    .intro-grid { display: grid; grid-template-columns: minmax(0, 900px); align-items: center; }
+    .quiz-grid, .final-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(280px, .65fr); gap: clamp(48px, 8vw, 120px); align-items: center; }
+    .intro-grid > *, .quiz-grid > *, .final-grid > * { min-width: 0; }
+
+    .kicker { display: flex; align-items: center; gap: 13px; color: var(--red-soft); }
+    .kicker::before { width: 34px; height: 1px; background: currentColor; content: ""; }
+    h1, h2, p { margin-top: 0; }
+    h1 { max-width: 800px; margin-bottom: 27px; font-family: "Playfair Display", Georgia, serif; font-size: clamp(62px, 7.5vw, 110px); font-weight: 600; letter-spacing: -.045em; line-height: .91; }
+    h1 span { display: block; }
+    h1 em { color: var(--red-soft); font-weight: inherit; }
+    .lede { max-width: 590px; margin-bottom: 0; color: var(--paper-soft); font-size: clamp(15px, 1.4vw, 18px); line-height: 1.7; }
+
+    .primary-button { position: relative; display: inline-flex; min-height: 58px; align-items: center; justify-content: space-between; gap: 36px; overflow: hidden; border: 1px solid var(--red); border-radius: 3px; padding: 0 21px; background: var(--red); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform .25s var(--ease), background .25s ease, box-shadow .25s ease; }
+    .primary-button::before { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, .18), transparent 80%); content: ""; transform: translateX(-120%); transition: transform .6s var(--ease); }
+    .primary-button:hover { transform: translateY(-2px); box-shadow: 0 14px 35px rgba(238, 88, 78, .2); }
+    .primary-button:hover::before { transform: translateX(120%); }
+    .primary-button:disabled { cursor: default; opacity: .45; transform: none; box-shadow: none; }
+    .primary-button:focus-visible, .answer:focus-visible, .text-input:focus-visible, .text-button:focus-visible { outline: 2px solid var(--paper); outline-offset: 4px; }
+    .arrow { font-size: 20px; line-height: 1; }
+
+    .mini-label { color: var(--paper-faint); }
+    .intro-action { margin-top: 38px; }
+
+    .progress-panel { align-self: stretch; }
+    .progress-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 17px; color: var(--paper-faint); font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    .progress-count { color: var(--paper); }
+    .progress-track { height: 2px; overflow: hidden; background: rgba(242, 238, 232, .11); }
+    .progress-fill { width: 25%; height: 100%; background: var(--red); box-shadow: 0 0 12px rgba(238, 88, 78, .5); transition: width .55s var(--ease); }
+    .question-wrap { max-width: 720px; }
+    .step-label { margin-bottom: 24px; color: var(--red-soft); }
+    .question-title { margin-bottom: 35px; font-family: "Playfair Display", Georgia, serif; font-size: clamp(42px, 5vw, 68px); font-weight: 600; letter-spacing: -.035em; line-height: 1.02; }
+    .answers { display: grid; gap: 10px; }
+
+    .answer { display: grid; min-height: 66px; grid-template-columns: 34px 1fr auto; align-items: center; gap: 14px; border: 1px solid var(--line); border-radius: 3px; padding: 10px 18px; background: rgba(255, 255, 255, .025); color: var(--paper); cursor: pointer; text-align: left; transition: border-color .22s ease, background .22s ease, transform .22s var(--ease); }
+    .answer:hover { border-color: rgba(238, 88, 78, .68); background: rgba(238, 88, 78, .08); transform: translateX(5px); }
+    .answer-index { color: var(--paper-faint); font-family: "DM Mono", monospace; font-size: 10px; }
+    .answer-text { font-size: 14px; font-weight: 500; }
+    .answer-arrow { color: var(--red-soft); font-size: 17px; opacity: 0; transform: translateX(-7px); transition: .22s ease; }
+    .answer:hover .answer-arrow { opacity: 1; transform: translateX(0); }
+    .quiz-aside { border-left: 1px solid var(--line); padding-left: clamp(30px, 5vw, 64px); }
+    .aside-number { margin-bottom: 24px; color: rgba(242, 238, 232, .08); font-family: "Playfair Display", Georgia, serif; font-size: 120px; font-style: italic; line-height: .8; }
+    .aside-copy { max-width: 260px; margin-bottom: 0; color: var(--paper-faint); font-size: 12px; line-height: 1.75; }
+
+    .password-hint { margin: -17px 0 30px; color: var(--paper-soft); font-size: 14px; line-height: 1.65; }
+    .password-card { border: 1px solid var(--line); border-radius: 3px; padding: 23px; background: rgba(255, 255, 255, .025); }
+    .password-line { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .password-copy { min-width: 0; }
+    .password-copy .mini-label { display: block; margin-bottom: 10px; }
+    .password-value { color: var(--red-soft); font-family: "DM Mono", monospace; font-size: clamp(13px, 1.6vw, 16px); line-height: 1.55; }
+    .copy-button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 2px; padding: 9px 12px; background: transparent; color: var(--paper-soft); cursor: pointer; font-size: 10px; transition: .2s ease; }
+    .copy-button:hover { border-color: var(--red); color: var(--paper); }
+    .input-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 13px; }
+    .text-input { min-width: 0; height: 58px; border: 1px solid var(--line); border-radius: 3px; padding: 0 17px; background: rgba(0, 0, 0, .19); color: var(--paper); caret-color: var(--red); outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
+    .text-input::placeholder { color: rgba(242, 238, 232, .28); }
+    .text-input:focus { border-color: rgba(238, 88, 78, .7); box-shadow: 0 0 0 3px rgba(238, 88, 78, .08); }
+    .text-input.error { border-color: #d78a82; animation: shake .35s ease; }
+    .input-row .primary-button { min-height: 58px; }
+    .form-message { min-height: 20px; margin: 10px 0 0; color: #eaa39d; font-size: 11px; }
+    .quiz-nav { margin-top: 24px; }
+    .text-button { border: 0; padding: 4px 0; background: none; color: var(--paper-faint); cursor: pointer; font-size: 11px; transition: color .2s ease; }
+    .text-button:hover { color: var(--paper); }
+
+    .album-head { max-width: 100%; margin-bottom: 28px; }
+    .album-head-row { margin-bottom: 16px; }
+    .album-title { max-width: 830px; margin: 12px 0 8px; font-family: "Playfair Display", Georgia, serif; font-size: clamp(45px, 5.2vw, 70px); font-weight: 600; letter-spacing: -.045em; line-height: .95; }
+    .album-subtitle { margin: 0; color: var(--paper-soft); font-family: "Playfair Display", Georgia, serif; font-size: clamp(15px, 1.6vw, 19px); font-style: italic; line-height: 1.6; }
+    .audio-status { display: inline-flex; min-height: 31px; align-items: center; gap: 10px; margin-top: 17px; border: 1px solid rgba(170, 160, 128, .2); border-radius: 99px; padding: 7px 12px; background: rgba(5, 9, 10, .52); color: var(--paper-faint); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .08em; }
+    .audio-bars { display: flex; height: 11px; align-items: flex-end; gap: 2px; }
+    .audio-bars i { display: block; width: 2px; height: 4px; background: var(--red-soft); }
+    .audio-status.playing .audio-bars i { animation: audio-bar .7s ease-in-out infinite alternate; }
+    .audio-status.playing .audio-bars i:nth-child(2) { animation-delay: -.35s; }
+    .audio-status.playing .audio-bars i:nth-child(3) { animation-delay: -.15s; }
+    .preview-audio { display: none; width: min(100%, 520px); height: 34px; margin-top: 9px; opacity: .72; }
+    .preview-audio.ready { display: block; }
+    .album-layout { display: grid; grid-template-columns: minmax(390px, .86fr) minmax(0, 1.14fr); gap: 18px; align-items: stretch; }
+    .track-list { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+
+    .track-card {
+      position: relative;
+      display: grid;
+      min-width: 0;
+      width: 100%;
+      min-height: 91px;
+      grid-template-columns: 74px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      border: 0;
+      border-radius: 0;
+      padding: 9px 42px 9px 2px;
+      background: transparent;
+      color: var(--paper);
+      cursor: pointer;
+      text-align: left;
+      transition: opacity .28s ease, transform .28s var(--ease);
+    }
+
+    .track-card:hover { opacity: .78; transform: translateX(5px); }
+    .track-card.active { opacity: 1; transform: translateX(7px); }
+    .track-card.active::before { position: absolute; top: 50%; left: -15px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 14px rgba(238, 88, 78, .8); content: ""; transform: translateY(-50%); }
+    .track-art { position: relative; width: 74px; aspect-ratio: 1; overflow: hidden; border-radius: 2px; background: #0b1011; }
+    .track-art img { display: block; width: 100%; height: 100%; object-fit: cover; filter: saturate(.82) contrast(1.04); transition: filter .35s ease, transform .55s var(--ease); }
+    .track-card:hover .track-art img, .track-card.active .track-art img { filter: saturate(1) contrast(1.06); transform: scale(1.045); }
+    .track-index { position: absolute; top: 7px; left: 7px; min-width: 25px; border: 1px solid rgba(242, 238, 232, .3); border-radius: 99px; padding: 4px 6px; background: rgba(4, 6, 7, .7); color: var(--paper); font-family: "DM Mono", monospace; font-size: 7px; letter-spacing: .08em; text-align: center; backdrop-filter: blur(6px); }
+    .play-mark { position: absolute; right: 7px; bottom: 7px; display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid rgba(242, 238, 232, .38); border-radius: 50%; background: rgba(3, 7, 9, .72); color: var(--paper); font-size: 9px; line-height: 1; backdrop-filter: blur(7px); transition: border-color .2s ease, background .2s ease, transform .2s var(--ease); }
+    .track-card:hover .play-mark, .track-card.playing .play-mark { border-color: var(--red); background: var(--red); transform: scale(1.06); }
+    .track-copy { min-width: 0; }
+    .track-copy small { display: block; margin-bottom: 6px; color: var(--paper-faint); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .16em; text-transform: uppercase; }
+    .track-copy strong { display: block; color: var(--paper); font-family: "Playfair Display", Georgia, serif; font-size: clamp(16px, 1.45vw, 19px); font-weight: 600; line-height: 1.15; }
+    .track-open { display: block; margin-top: 8px; color: var(--red-soft); font-family: "DM Mono", monospace; font-size: 7px; letter-spacing: .1em; text-transform: uppercase; }
+
+    .hidden-track { color: var(--gold-soft); }
+    .hidden-art { display: grid; place-items: center; }
+    .hidden-art::before { position: absolute; inset: -12px; background: linear-gradient(rgba(3, 7, 9, .3), rgba(3, 7, 9, .72)), url("assets/joji-solaris-hero.png") 68% center / cover; content: ""; filter: blur(6px) grayscale(.5); transform: scale(1.12); }
+    .lock-mark { position: relative; z-index: 1; display: grid; width: 36px; height: 31px; place-items: center; border: 1px solid rgba(208, 196, 156, .6); border-radius: 3px; background: rgba(4, 8, 9, .7); color: var(--gold-soft); font-family: "DM Mono", monospace; font-size: 11px; }
+    .lock-mark::before { position: absolute; bottom: 25px; width: 19px; height: 16px; border: 1px solid rgba(208, 196, 156, .6); border-bottom: 0; border-radius: 12px 12px 0 0; content: ""; }
+    .hidden-track .track-copy strong { color: var(--gold-soft); }
+    .hidden-arrow { display: inline-block; margin-left: 8px; color: var(--gold-soft); font-family: "DM Mono", monospace; font-size: 16px; line-height: .7; vertical-align: -2px; transition: transform .25s var(--ease), color .25s ease; }
+    .hidden-track:hover .hidden-arrow { color: var(--red-soft); transform: translateX(5px); }
+
+    .story-panel { position: relative; min-height: 100%; overflow: hidden; border: 0; border-radius: 0; padding: clamp(18px, 2.2vw, 30px) clamp(4px, 2vw, 26px); background: transparent; box-shadow: none; }
+    .story-panel::after { display: none; }
+    .story-inner { position: relative; z-index: 1; animation: story-in .45s var(--ease) both; }
+    .story-label { margin-bottom: 22px; color: var(--red-soft); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .17em; text-transform: uppercase; }
+    .story-header { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 21px; align-items: center; margin-bottom: 23px; }
+    .story-cover { display: block; width: 112px; height: 112px; border: 0; border-radius: 2px; object-fit: cover; box-shadow: 0 16px 42px rgba(0, 0, 0, .34); }
+    .story-title { margin: 0 0 8px; color: var(--gold-soft); font-family: "Playfair Display", Georgia, serif; font-size: clamp(28px, 2.8vw, 40px); font-weight: 600; line-height: 1.05; }
+    .story-artist { color: var(--paper-faint); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+    .story-text { margin: 0; color: rgba(242, 238, 232, .78); font-family: "Playfair Display", Georgia, serif; font-size: clamp(15px, 1.35vw, 18px); line-height: 1.58; }
+    .story-empty { display: grid; min-height: 275px; align-content: center; }
+    .story-empty strong { display: block; margin-bottom: 15px; color: var(--gold-soft); font-family: "Playfair Display", Georgia, serif; font-size: 27px; font-weight: 600; }
+    .story-empty p { max-width: 310px; margin: 0; color: var(--paper-faint); font-size: 12px; line-height: 1.7; }
+
+    .reveal-wrap { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: 24px; background: rgba(2, 5, 6, .88); opacity: 0; visibility: hidden; backdrop-filter: blur(18px); transition: opacity .5s ease, visibility .5s ease; }
+    .reveal-wrap.open { opacity: 1; visibility: visible; }
+    .reveal-card { position: relative; display: grid; width: min(100%, 920px); min-width: 0; max-width: 100%; min-height: min(650px, calc(100svh - 48px)); place-items: center; overflow: hidden; border: 1px solid rgba(170, 160, 128, .35); border-radius: 4px; padding: clamp(28px, 6vw, 78px); background: #060a0b; box-shadow: 0 45px 140px rgba(0, 0, 0, .6); text-align: center; }
+    .reveal-card::before { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(3, 7, 9, .28), rgba(3, 7, 9, .68) 78%), linear-gradient(rgba(3, 7, 9, .34), rgba(3, 7, 9, .75)), url("assets/reveal-couple-background.png") center / cover; content: ""; filter: grayscale(1) contrast(1.05); opacity: .82; transform: scale(1.04); transition: opacity 1.2s ease, transform 1.8s var(--ease); }
+    .reveal-card.finale::before { opacity: 1; transform: scale(1); }
+    .reveal-close { position: absolute; z-index: 3; top: 20px; right: 22px; width: 38px; height: 38px; border: 1px solid rgba(242, 238, 232, .18); border-radius: 50%; background: rgba(3, 7, 9, .45); color: var(--paper-soft); cursor: pointer; font-size: 18px; transition: border-color .2s ease, color .2s ease; }
+    .reveal-close:hover { border-color: var(--red); color: var(--paper); }
+    .reveal-content { position: relative; z-index: 2; width: min(100%, 720px); }
+    .reveal-label { margin-bottom: 36px; color: var(--gold); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
+    .reveal-line { max-width: 690px; margin: 0 auto; color: rgba(242, 238, 232, .84); font-family: "Playfair Display", Georgia, serif; font-size: clamp(22px, 3.2vw, 37px); line-height: 1.4; opacity: 0; transform: translateY(14px); transition: opacity .9s ease, transform .9s var(--ease); }
+    .reveal-line + .reveal-line { margin-top: 28px; color: var(--red-soft); font-style: italic; }
+    .reveal-line.show { opacity: 1; transform: translateY(0); }
+    .reveal-final { position: absolute; z-index: 2; inset: 0; display: grid; min-width: 0; place-items: center; padding: clamp(30px, 6vw, 75px); opacity: 0; pointer-events: none; transform: scale(.97); transition: opacity 1s ease, transform 1.1s var(--ease); }
+    .reveal-final > div { width: min(100%, 760px); min-width: 0; }
+    .finale .reveal-content { opacity: 0; transform: translateY(-12px); transition: opacity .6s ease, transform .6s ease; }
+    .finale .reveal-final { opacity: 1; pointer-events: auto; transform: scale(1); }
+    .reveal-heart { margin-bottom: 18px; color: var(--red-soft); font-size: 23px; }
+    .reveal-final h2 { margin: 0; color: var(--paper); font-family: "Playfair Display", Georgia, serif; font-size: clamp(46px, 8vw, 94px); font-weight: 600; letter-spacing: -.045em; line-height: .92; text-shadow: 0 5px 45px rgba(0, 0, 0, .8); }
+    .reveal-final p { margin: 22px 0 32px; color: var(--gold-soft); font-family: "Playfair Display", Georgia, serif; font-size: clamp(15px, 2vw, 20px); font-style: italic; }
+    .reveal-actions { display: flex; justify-content: center; }
+
+    @keyframes story-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes audio-bar { from { height: 3px; } to { height: 11px; } }
+
+    .success-copy h2 { max-width: 650px; margin: 20px 0 24px; font-family: "Playfair Display", Georgia, serif; font-size: clamp(51px, 6vw, 86px); font-weight: 600; letter-spacing: -.045em; line-height: .94; }
+    .success-copy h2 em { color: var(--red-soft); font-weight: inherit; }
+    .success-text { max-width: 520px; margin-bottom: 28px; color: var(--paper-soft); font-size: 15px; line-height: 1.7; }
+    .compatibility { display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(155, 196, 156, .25); border-radius: 999px; padding: 9px 13px; background: rgba(155, 196, 156, .06); color: var(--green); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .compatibility i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+
+    .ticket-stack { display: grid; width: 100%; min-width: 0; gap: 13px; perspective: 1000px; }
+    .ticket {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(170, 160, 128, .45);
+      border-radius: 3px;
+      background: #080d0f;
+      color: var(--gold-soft);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .48);
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      transform: rotate(1deg);
+      transition: transform .35s var(--ease), border-color .35s ease;
+    }
+    .ticket:nth-child(2) { transform: translateX(-12px) rotate(-1.25deg); }
+    .ticket:hover { z-index: 3; border-color: rgba(208, 196, 156, .78); transform: translateY(-5px) rotate(0); }
+    .ticket::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(5, 9, 10, .98) 0%, rgba(5, 9, 10, .83) 58%, rgba(5, 9, 10, .3) 100%),
+        url("assets/joji-solaris-hero.png") 76% 45% / 170% auto no-repeat;
+      content: "";
+      opacity: .82;
+    }
+    .ticket::after { position: absolute; z-index: 2; top: 0; bottom: 0; right: 58px; border-left: 1px dashed rgba(170, 160, 128, .28); content: ""; }
+    .ticket-top, .ticket-body { position: relative; z-index: 1; }
+    .ticket-top { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(170, 160, 128, .22); padding: 12px 18px; }
+    .ticket-meta { color: rgba(208, 196, 156, .55); }
+    .ticket-meta strong { color: var(--gold-soft); font-weight: 500; }
+    .ticket-body { padding: 18px 74px 18px 18px; }
+    .ticket-heading { display: flex; align-items: baseline; gap: 12px; }
+    .ticket-artist { margin: 0; color: var(--gold-soft); font-family: "Playfair Display", Georgia, serif; font-size: 40px; font-style: italic; font-weight: 600; letter-spacing: -.06em; line-height: .78; text-shadow: 0 2px 24px rgba(0, 0, 0, .8); }
+    .ticket-live { color: var(--red); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .24em; text-transform: uppercase; }
+    .ticket-owner { margin: 15px 0 16px; color: #f1ead2; font-family: "Playfair Display", Georgia, serif; font-size: clamp(20px, 2.2vw, 27px); font-weight: 600; letter-spacing: .01em; }
+    .ticket-details { display: grid; grid-template-columns: 1.15fr .8fr .9fr; gap: 14px; }
+    .ticket-row { min-width: 0; }
+    .ticket-row small { display: block; margin-bottom: 5px; color: rgba(208, 196, 156, .46); font-size: 7px; }
+    .ticket-row strong { display: block; overflow: hidden; color: rgba(242, 238, 232, .88); font-size: 9px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+    .ticket-serial { position: absolute; z-index: 3; top: 50%; right: 17px; color: rgba(208, 196, 156, .45); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .2em; transform: translateY(-50%) rotate(90deg); }
+    .barcode { height: 15px; margin-top: 15px; background: repeating-linear-gradient(90deg, var(--gold-soft) 0 1px, transparent 1px 4px, var(--gold-soft) 4px 7px, transparent 7px 9px, var(--gold-soft) 9px 10px, transparent 10px 14px); opacity: .38; }
+    .final-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; margin-top: 32px; }
+    .burst { position: fixed; z-index: 20; width: 7px; height: 13px; border-radius: 1px; pointer-events: none; animation: burst 1.2s var(--ease) forwards; }
+
+    @keyframes screen-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes breathe { from { transform: rotate(-15deg) scale(1); } to { transform: rotate(-10deg) scale(1.06); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-6px); } 60% { transform: translateX(5px); } }
+    @keyframes burst { 0% { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); } }
+
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 48px, 700px); }
+      .main { min-height: 100svh; }
+      .intro-grid, .quiz-grid, .final-grid { width: 100%; grid-template-columns: minmax(0, 1fr); gap: 42px; }
+      .album-layout { grid-template-columns: minmax(0, 1fr); }
+      .story-panel { min-height: 320px; }
+      .quiz-aside { display: none; }
+      .final-grid { padding-block: 25px; }
+      .ticket-stack { width: min(100%, 560px); }
+      .ticket { max-width: 560px; }
+      .ambient-word { top: 38%; right: -16vw; }
+    }
+
+    @media (max-width: 560px) {
+      .app { background-position: center, center, 68% center, center; background-attachment: scroll; }
+      .shell { width: calc(100% - 34px); }
+      .main { min-height: 100svh; padding-block: 38px; }
+      h1 { margin-bottom: 22px; font-size: clamp(48px, 14vw, 70px); }
+      .lede { font-size: 14px; }
+      .intro-action { margin-top: 29px; }
+      .primary-button { width: 100%; }
+      .question-title { margin-bottom: 28px; font-size: clamp(39px, 12vw, 56px); }
+      .album-head { margin-bottom: 30px; }
+      .album-head-row { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .album-title { max-width: 100%; font-size: clamp(38px, 11.5vw, 48px); }
+      .album-layout { gap: 20px; }
+      .track-list { grid-template-columns: 1fr; }
+      .track-card { grid-template-columns: 82px minmax(0, 1fr); }
+      .track-art { width: 82px; }
+      .story-panel { min-height: 300px; padding: 24px 20px; }
+      .story-header { grid-template-columns: 84px minmax(0, 1fr); gap: 15px; }
+      .story-cover { width: 84px; height: 84px; }
+      .story-empty { min-height: 245px; }
+      .reveal-wrap { padding: 10px; }
+      .reveal-card { min-height: calc(100svh - 20px); }
+      .reveal-card::before { background-position: center, center, 57% center; }
+      .reveal-close { top: 14px; right: 14px; }
+      .reveal-final > div { max-width: 100%; }
+      .reveal-final p { max-width: 300px; margin-right: auto; margin-left: auto; }
+      .reveal-actions { width: 100%; }
+      .reveal-actions .primary-button { width: min(100%, 280px); margin-inline: auto; }
+      .reveal-label { margin-bottom: 28px; }
+      .reveal-line + .reveal-line { margin-top: 22px; }
+      .answer { min-height: 62px; grid-template-columns: 25px 1fr; padding-inline: 14px; }
+      .answer-arrow { display: none; }
+      .answer-text { font-size: 13px; }
+      .password-card { padding: 18px; }
+      .password-line { align-items: flex-start; flex-direction: column; }
+      .copy-button { align-self: flex-end; }
+      .input-row { grid-template-columns: 1fr; }
+      .success-copy h2 { font-size: clamp(48px, 14vw, 68px); }
+      .ticket:nth-child(2) { transform: rotate(-.75deg); }
+      .ticket-top { padding: 11px 14px; }
+      .ticket-meta { font-size: 7px; letter-spacing: .1em; }
+      .ticket-body { padding: 17px 55px 17px 14px; }
+      .ticket::after { right: 42px; }
+      .ticket-serial { right: 9px; }
+      .ticket-details { grid-template-columns: 1fr 1fr; gap: 11px; }
+      .ticket-row:first-child { grid-column: 1 / -1; }
+      .ticket-heading { flex-wrap: wrap; gap: 8px; }
+      .ticket-artist { font-size: 36px; }
+      .ticket-owner { margin-block: 13px; font-size: 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+
+    @media print {
+      body { background: white; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .app { display: block; min-height: auto; background: white; }
+      .app::before, .app::after, .success-copy, .ambient-word { display: none; }
+      .main { display: block; min-height: auto; padding: 40px; }
+      .screen { display: none !important; }
+      #final-screen { display: block !important; }
+      .final-grid { display: block; }
+      .ticket-stack { width: 560px; margin: 0 auto; }
+      .ticket { width: 100%; break-inside: avoid; box-shadow: none; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <main class="main shell">
+      <div class="ambient-word" aria-hidden="true">us</div>
+
+      <section class="screen active" id="intro-screen" aria-labelledby="intro-title">
+        <div class="intro-grid">
+          <div>
+            <h1 id="intro-title">Сако + Бека — только вместе мы сильны.</h1>
+            <div class="intro-action"><button class="primary-button" id="start-button" type="button"><span>Начать сомнительный тест</span><span class="arrow" aria-hidden="true">↗</span></button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="quiz-screen" aria-labelledby="question-title">
+        <div class="progress-panel">
+          <div class="progress-top"><span>Проверка допуска</span><span class="progress-count"><span id="current-step">01</span> / 04</span></div>
+          <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+        <div class="quiz-grid" style="margin-top: clamp(50px, 8vh, 86px);">
+          <div class="question-wrap" id="question-content"></div>
+          <aside class="quiz-aside" aria-hidden="true">
+            <div class="aside-number" id="aside-number">01</div>
+            <p class="aside-copy" id="aside-copy">Никаких неправильных ответов. Только материалы для будущего шантажа.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen" id="music-screen" aria-labelledby="album-title">
+        <header class="album-head">
+          <div class="album-head-row">
+            <div class="kicker">Личный альбом · 04 трека</div>
+          </div>
+          <h2 class="album-title" id="album-title">Мои любимые песни про тебя</h2>
+          <p class="album-subtitle">Каждая песня напоминает мне о тебе.</p>
+          <div class="audio-status" id="audio-status" aria-live="polite"><span class="audio-bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="audio-status-text">Нажми на обложку, чтобы включить песню</span></div>
+          <audio class="preview-audio" id="preview-audio" preload="metadata" controls>Ваш браузер не поддерживает воспроизведение аудио.</audio>
+        </header>
+
+        <div class="album-layout">
+          <div class="track-list" aria-label="Треки нашего альбома">
+            <button class="track-card" type="button" data-track="0" aria-expanded="false" aria-controls="track-story">
+              <span class="track-art">
+                <img src="assets/cover-glimpse-of-us.jpg" alt="Обложка сингла Glimpse of Us" width="800" height="800" loading="lazy" decoding="async">
+                <span class="track-index">01</span>
+                <span class="play-mark" aria-hidden="true">▶</span>
+              </span>
+              <span class="track-copy"><small>Joji · 2022</small><strong>Glimpse of Us</strong><span class="track-open">Нажми, чтобы включить →</span></span>
+            </button>
+
+            <button class="track-card" type="button" data-track="1" aria-expanded="false" aria-controls="track-story">
+              <span class="track-art">
+                <img src="assets/cover-ballads-1.jpg" alt="Обложка альбома BALLADS 1" width="800" height="800" loading="lazy" decoding="async">
+                <span class="track-index">02</span>
+                <span class="play-mark" aria-hidden="true">▶</span>
+              </span>
+              <span class="track-copy"><small>Joji · 2018</small><strong>SLOW DANCING IN THE DARK</strong><span class="track-open">Нажми, чтобы включить →</span></span>
+            </button>
+
+            <button class="track-card" type="button" data-track="2" aria-expanded="false" aria-controls="track-story">
+              <span class="track-art">
+                <img src="assets/cover-nectar.jpg" alt="Обложка альбома Nectar" width="800" height="800" loading="lazy" decoding="async">
+                <span class="track-index">03</span>
+                <span class="play-mark" aria-hidden="true">▶</span>
+              </span>
+              <span class="track-copy"><small>Joji · 2020</small><strong>Like You Do</strong><span class="track-open">Нажми, чтобы включить →</span></span>
+            </button>
+
+            <button class="track-card hidden-track" id="hidden-track" type="button" aria-haspopup="dialog" aria-controls="reveal-wrap">
+              <span class="track-art hidden-art"><span class="track-index">04</span><span class="lock-mark" aria-hidden="true">◆</span></span>
+              <span class="track-copy"><small>Секретный трек</small><strong>04 — ??? <span class="hidden-arrow" aria-hidden="true">→</span></strong><span class="track-open">Здесь спрятано кое-что особенное...</span></span>
+            </button>
+          </div>
+
+          <aside class="story-panel" id="track-story" aria-live="polite" aria-atomic="true">
+            <div class="story-inner story-empty">
+              <div class="story-label">Почему эти песни здесь</div>
+              <strong>Нажми на обложку.</strong>
+              <p>Песня заиграет, а здесь появятся слова, которые я хотел тебе сказать.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen" id="final-screen" aria-labelledby="final-title">
+        <div class="final-grid">
+          <div class="success-copy">
+            <div class="compatibility"><i></i><span>Совместимость подтверждена · 200%</span></div>
+            <h2 id="final-title">Доступ <em>разрешён.</em></h2>
+            <p class="success-text">Ты прошла самую объективную проверку в интернете. Остался только один пункт: прожить ещё один очень красивый вечер вместе.</p>
+            <div class="final-actions">
+              <button class="primary-button" id="save-button" type="button"><span>Сохранить билет</span><span class="arrow" aria-hidden="true">↓</span></button>
+              <button class="text-button" id="restart-button" type="button">пройти этот кринж ещё раз</button>
+            </div>
+          </div>
+          <div class="ticket-stack" aria-label="Два именных билета на концерт Joji">
+            <article class="ticket" aria-label="Билет для Beka Tom Hardy">
+              <div class="ticket-top"><span class="ticket-meta"><strong>Solaris</strong> · admission</span><span class="ticket-meta">Ticket 01 / 02</span></div>
+              <div class="ticket-body">
+                <div class="ticket-heading"><h3 class="ticket-artist">Joji</h3><span class="ticket-live">Live in Malaysia</span></div>
+                <div class="ticket-owner">Beka Tom Hardy</div>
+                <div class="ticket-details">
+                  <div class="ticket-row"><small>Venue</small><strong>Idea Live Arena</strong></div>
+                  <div class="ticket-row"><small>City</small><strong>Kuala Lumpur</strong></div>
+                  <div class="ticket-row"><small>Date</small><strong>December 02</strong></div>
+                </div>
+                <div class="barcode" aria-hidden="true"></div>
+              </div>
+              <span class="ticket-serial">JJI–BEKA–730</span>
+            </article>
+
+            <article class="ticket" aria-label="Билет для Sako Princess">
+              <div class="ticket-top"><span class="ticket-meta"><strong>Solaris</strong> · admission</span><span class="ticket-meta">Ticket 02 / 02</span></div>
+              <div class="ticket-body">
+                <div class="ticket-heading"><h3 class="ticket-artist">Joji</h3><span class="ticket-live">Live in Malaysia</span></div>
+                <div class="ticket-owner">Sako Princess</div>
+                <div class="ticket-details">
+                  <div class="ticket-row"><small>Venue</small><strong>Idea Live Arena</strong></div>
+                  <div class="ticket-row"><small>City</small><strong>Kuala Lumpur</strong></div>
+                  <div class="ticket-row"><small>Date</small><strong>December 02</strong></div>
+                </div>
+                <div class="barcode" aria-hidden="true"></div>
+              </div>
+              <span class="ticket-serial">JJI–SAKO–730</span>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <div class="reveal-wrap" id="reveal-wrap" role="dialog" aria-modal="true" aria-labelledby="reveal-title" aria-hidden="true">
+    <section class="reveal-card" id="reveal-card">
+      <button class="reveal-close" id="reveal-close" type="button" aria-label="Закрыть">×</button>
+      <div class="reveal-content">
+        <div class="reveal-label">Секретный трек · 04</div>
+        <p class="reveal-line" id="reveal-line-one">Я выбрал эти песни, потому что каждая из них напоминает мне о тебе. Но есть одна песня, с которой у нас пока нет общего воспоминания.</p>
+        <p class="reveal-line" id="reveal-line-two">И я хочу это исправить.</p>
+      </div>
+      <div class="reveal-final">
+        <div>
+          <div class="reveal-heart" aria-hidden="true">♡</div>
+          <h2 id="reveal-title">МЫ ИДЁМ<br>НА JOJI! ♡</h2>
+          <p>Наше следующее любимое воспоминание начинается здесь.</p>
+          <div class="reveal-actions"><button class="primary-button" id="open-tickets" type="button" disabled><span>Открыть наши билеты</span><span class="arrow" aria-hidden="true">↗</span></button></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const introScreen = document.getElementById("intro-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const musicScreen = document.getElementById("music-screen");
+    const finalScreen = document.getElementById("final-screen");
+    const questionContent = document.getElementById("question-content");
+    const currentStep = document.getElementById("current-step");
+    const progressFill = document.getElementById("progress-fill");
+    const asideNumber = document.getElementById("aside-number");
+    const asideCopy = document.getElementById("aside-copy");
+    const trackStory = document.getElementById("track-story");
+    const trackCards = [...document.querySelectorAll("[data-track]")];
+    const hiddenTrack = document.getElementById("hidden-track");
+    const revealWrap = document.getElementById("reveal-wrap");
+    const revealCard = document.getElementById("reveal-card");
+    const revealClose = document.getElementById("reveal-close");
+    const revealLineOne = document.getElementById("reveal-line-one");
+    const revealLineTwo = document.getElementById("reveal-line-two");
+    const openTickets = document.getElementById("open-tickets");
+    const previewAudio = document.getElementById("preview-audio");
+    const audioStatus = document.getElementById("audio-status");
+    const audioStatusText = document.getElementById("audio-status-text");
+    const password = "Бекосик я тебя люблю, ты качок";
+    const answers = [];
+    let step = 0;
+    let revealTimers = [];
+    let revealTrigger = null;
+    let activeTrackIndex = null;
+
+    const questions = [
+      { title: "Насколько ты готова слушать, как я подпеваю Joji?", options: ["Потерплю", "Буду подпевать громче", "Ради билета переживу всё"] },
+      { title: "Что делаем после концерта?", options: ["Ищем еду ночью", "Гуляем без маршрута", "Ты уже всё придумал, не притворяйся"] },
+      { title: "Кто первым расплачется на медленной песне?", options: ["Я", "Ты", "Оба, но никому не расскажем"] }
+    ];
+
+    const notes = [
+      "Никаких неправильных ответов. Только материалы для будущего шантажа.",
+      "Маршрут вечера формируется прямо сейчас. Возможны спонтанные остановки.",
+      "Эмоциональная устойчивость не входит в требования для получения билета.",
+      "Последний шаг. Тут уже придётся взять на себя немного ответственности."
+    ];
+
+    const trackNotes = [
+      {
+        number: "Трек 01",
+        title: "Glimpse of Us",
+        cover: "assets/cover-glimpse-of-us.jpg",
+        coverAlt: "Обложка Glimpse of Us",
+        preview: "assets/audio-glimpse-of-us.mp3",
+        message: "Эта песня напоминает мне о тебе, потому что в ней есть то чувство, которое сложно объяснить словами. Когда я смотрю на тебя, весь остальной мир будто становится тише. И если бы мне пришлось прожить тысячу разных жизней, я бы всё равно искал в каждой из них именно тебя."
+      },
+      {
+        number: "Трек 02",
+        title: "SLOW DANCING IN THE DARK",
+        cover: "assets/cover-ballads-1.jpg",
+        coverAlt: "Обложка BALLADS 1",
+        preview: "assets/audio-slow-dancing.mp3",
+        message: "Эта песня напоминает мне о тех моментах, когда мне хочется остановить время. Просто быть рядом с тобой, обнимать тебя и никуда не спешить. Даже если вокруг будет темно и весь мир сойдёт с ума, мне будет достаточно того, что твоя рука в моей."
+      },
+      {
+        number: "Трек 03",
+        title: "Like You Do",
+        cover: "assets/cover-nectar.jpg",
+        coverAlt: "Обложка Nectar",
+        preview: "assets/audio-like-you-do.mp3",
+        message: "Эта песня напоминает мне о том, насколько ты особенная для меня. Я могу провести целый день с тобой и всё равно скучать, как только мы попрощаемся. Мне нравится в тебе даже то, чего ты сама в себе не замечаешь. И я не думаю, что кто-то когда-нибудь сможет заставить меня чувствовать себя так, как это делаешь ты."
+      }
+    ];
+
+    function showScreen(screen) {
+      [introScreen, quizScreen, musicScreen, finalScreen].forEach((item) => item.classList.remove("active"));
+      screen.classList.add("active");
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+
+    function updateProgress() {
+      const visibleStep = step + 1;
+      currentStep.textContent = String(visibleStep).padStart(2, "0");
+      asideNumber.textContent = String(visibleStep).padStart(2, "0");
+      asideCopy.textContent = notes[step];
+      progressFill.style.width = `${visibleStep * 25}%`;
+    }
+
+    function renderQuestion() {
+      updateProgress();
+      if (step < questions.length) {
+        const question = questions[step];
+        questionContent.innerHTML = `
+          <div class="step-label">Вопрос ${String(step + 1).padStart(2, "0")}</div>
+          <h2 class="question-title" id="question-title">${question.title}</h2>
+          <div class="answers">
+            ${question.options.map((option, index) => `
+              <button class="answer" type="button" data-answer="${option}">
+                <span class="answer-index">0${index + 1}</span><span class="answer-text">${option}</span><span class="answer-arrow" aria-hidden="true">→</span>
+              </button>`).join("")}
+          </div>
+          ${step > 0 ? '<div class="quiz-nav"><button class="text-button" type="button" data-back>← вернуться назад</button></div>' : ''}`;
+
+        questionContent.querySelectorAll("[data-answer]").forEach((button) => {
+          button.addEventListener("click", () => { answers[step] = button.dataset.answer; step += 1; renderQuestion(); });
+        });
+      } else {
+        questionContent.innerHTML = `
+          <div class="step-label">Финальная проверка</div>
+          <h2 class="question-title" id="question-title">Если ты согласна пойти со мной на концерт — напиши и запомни пароль.</h2>
+          <p class="password-hint">Да, пароль лежит прямо перед тобой. Проверка сложная, но честная.</p>
+          <div class="password-card">
+            <div class="password-line">
+              <div class="password-copy"><span class="mini-label">Секретный пароль</span><div class="password-value">${password}</div></div>
+              <button class="copy-button" type="button" id="copy-password">копировать</button>
+            </div>
+          </div>
+          <form id="password-form" novalidate>
+            <div class="input-row"><input class="text-input" id="password-input" type="text" autocomplete="off" aria-describedby="form-message" placeholder="Напиши пароль сюда…"><button class="primary-button" type="submit"><span>Открыть альбом</span><span class="arrow" aria-hidden="true">↗</span></button></div>
+            <p class="form-message" id="form-message" role="status"></p>
+          </form>
+          <div class="quiz-nav"><button class="text-button" type="button" data-back>← вернуться назад</button></div>`;
+
+        const form = document.getElementById("password-form");
+        const input = document.getElementById("password-input");
+        const message = document.getElementById("form-message");
+        const copyButton = document.getElementById("copy-password");
+
+        copyButton.addEventListener("click", async () => {
+          try { await navigator.clipboard.writeText(password); copyButton.textContent = "скопировано ✓"; }
+          catch { input.value = password; input.focus(); input.select(); }
+        });
+
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const normalize = (value) => value.trim().toLocaleLowerCase("ru-RU").replace(/\s+/g, " ").replace(/[.!?]+$/g, "");
+          if (normalize(input.value) === normalize(password)) {
+            answers[3] = input.value.trim();
+            showScreen(musicScreen);
+          } else {
+            input.classList.remove("error");
+            void input.offsetWidth;
+            input.classList.add("error");
+            message.textContent = "Почти. Тут важна каждая часть признания — попробуй ещё раз :)";
+            input.focus();
+          }
+        });
+      }
+
+      const backButton = questionContent.querySelector("[data-back]");
+      if (backButton) backButton.addEventListener("click", () => { step = Math.max(0, step - 1); renderQuestion(); });
+    }
+
+    function celebrate() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const colors = ["#ee584e", "#ff8178", "#f2eee8", "#9bc49c"];
+      for (let i = 0; i < 42; i += 1) {
+        const piece = document.createElement("i");
+        piece.className = "burst";
+        piece.style.left = `${48 + Math.random() * 8}%`;
+        piece.style.top = `${42 + Math.random() * 12}%`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.setProperty("--x", `${(Math.random() - .5) * 700}px`);
+        piece.style.setProperty("--y", `${-100 + Math.random() * 550}px`);
+        piece.style.setProperty("--r", `${Math.random() * 620 - 310}deg`);
+        piece.style.animationDelay = `${Math.random() * .16}s`;
+        document.body.appendChild(piece);
+        window.setTimeout(() => piece.remove(), 1500);
+      }
+    }
+
+    function selectTrack(index) {
+      const track = trackNotes[index];
+      trackCards.forEach((card, cardIndex) => {
+        const isActive = cardIndex === index;
+        card.classList.toggle("active", isActive);
+        card.setAttribute("aria-expanded", String(isActive));
+      });
+      trackStory.innerHTML = `
+        <div class="story-inner">
+          <div class="story-label">${track.number} · почему она о тебе</div>
+          <div class="story-header">
+            <img class="story-cover" src="${track.cover}" alt="${track.coverAlt}" width="800" height="800">
+            <div><h3 class="story-title">${track.title}</h3><div class="story-artist">Joji</div></div>
+          </div>
+          <p class="story-text">«${track.message}»</p>
+        </div>`;
+      toggleTrackPlayback(index);
+    }
+
+    function updatePlaybackUI(index, isPlaying) {
+      trackCards.forEach((card, cardIndex) => {
+        const playing = isPlaying && cardIndex === index;
+        card.classList.toggle("playing", playing);
+        const mark = card.querySelector(".play-mark");
+        if (mark) mark.textContent = playing ? "Ⅱ" : "▶";
+      });
+      audioStatus.classList.toggle("playing", isPlaying);
+    }
+
+    function toggleTrackPlayback(index) {
+      const track = trackNotes[index];
+      if (activeTrackIndex === index && !previewAudio.paused) {
+        previewAudio.pause();
+        updatePlaybackUI(index, false);
+        audioStatusText.textContent = `Пауза · ${track.title}`;
+        return;
+      }
+
+      if (activeTrackIndex !== index) {
+        activeTrackIndex = index;
+        previewAudio.src = track.preview;
+        previewAudio.classList.add("ready");
+        previewAudio.load();
+      } else if (previewAudio.ended) {
+        previewAudio.currentTime = 0;
+      }
+
+      audioStatusText.textContent = `Загружается · ${track.title}`;
+      previewAudio.play().then(() => {
+        updatePlaybackUI(index, true);
+        audioStatusText.textContent = `Сейчас играет: ${track.title} · официальный фрагмент`;
+      }).catch(() => {
+        updatePlaybackUI(index, false);
+        audioStatusText.textContent = "Не удалось включить фрагмент. Проверь интернет и нажми ещё раз.";
+      });
+    }
+
+    function stopPreview() {
+      previewAudio.pause();
+      updatePlaybackUI(activeTrackIndex, false);
+      audioStatusText.textContent = "Нажми на обложку, чтобы включить песню";
+    }
+
+    function clearRevealTimers() {
+      revealTimers.forEach((timer) => window.clearTimeout(timer));
+      revealTimers = [];
+    }
+
+    function openReveal() {
+      clearRevealTimers();
+      stopPreview();
+      revealTrigger = document.activeElement;
+      revealCard.classList.remove("finale");
+      revealLineOne.classList.remove("show");
+      revealLineTwo.classList.remove("show");
+      openTickets.disabled = true;
+      revealWrap.classList.add("open");
+      revealWrap.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      revealClose.focus();
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const timings = reduced ? [20, 420, 900] : [280, 3000, 5700];
+      revealTimers.push(window.setTimeout(() => revealLineOne.classList.add("show"), timings[0]));
+      revealTimers.push(window.setTimeout(() => revealLineTwo.classList.add("show"), timings[1]));
+      revealTimers.push(window.setTimeout(() => {
+        revealCard.classList.add("finale");
+        openTickets.disabled = false;
+      }, timings[2]));
+    }
+
+    function closeReveal({ restoreFocus = true } = {}) {
+      clearRevealTimers();
+      revealWrap.classList.remove("open");
+      revealWrap.setAttribute("aria-hidden", "true");
+      revealCard.classList.remove("finale");
+      revealLineOne.classList.remove("show");
+      revealLineTwo.classList.remove("show");
+      openTickets.disabled = true;
+      document.body.style.overflow = "";
+      if (restoreFocus && revealTrigger instanceof HTMLElement) revealTrigger.focus();
+    }
+
+    function showFinal() { showScreen(finalScreen); celebrate(); }
+    trackCards.forEach((card) => card.addEventListener("click", () => selectTrack(Number(card.dataset.track))));
+    hiddenTrack.addEventListener("click", openReveal);
+    revealClose.addEventListener("click", () => closeReveal());
+    revealWrap.addEventListener("click", (event) => { if (event.target === revealWrap) closeReveal(); });
+    openTickets.addEventListener("click", () => { closeReveal({ restoreFocus: false }); showFinal(); });
+    previewAudio.addEventListener("ended", () => {
+      updatePlaybackUI(activeTrackIndex, false);
+      audioStatusText.textContent = "Фрагмент закончился. Нажми ещё раз, чтобы переслушать.";
+    });
+    document.addEventListener("keydown", (event) => {
+      if (!revealWrap.classList.contains("open")) return;
+      if (event.key === "Escape") closeReveal();
+      if (event.key === "Tab") {
+        const focusable = [...revealWrap.querySelectorAll("button:not(:disabled)")];
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+    document.getElementById("start-button").addEventListener("click", () => { step = 0; showScreen(quizScreen); renderQuestion(); });
+    document.getElementById("save-button").addEventListener("click", () => window.print());
+    document.getElementById("restart-button").addEventListener("click", () => { answers.length = 0; step = 0; showScreen(introScreen); });
+  </script>
+</body>
+</html>
